@@ -113,6 +113,12 @@
     border-radius: 5px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
   #labels div.sel { background: var(--text); color: #fff; border-color: var(--text); }
 
+  #tip { position: fixed; pointer-events: none; display: none; background: var(--text);
+    color: #fff; border-radius: 5px; padding: 2px 8px; font-size: 12px; white-space: nowrap; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #1b5e66; }
+  #where button { margin-left: 6px; padding: 1px 8px; }
+  #card .contents { margin: 6px 0; color: var(--muted); }
   #drop { position: fixed; inset: 0; display: none; align-items: center;
     justify-content: center; background: rgba(220,218,213,.8); font-size: 16px;
     pointer-events: none; }
@@ -134,6 +140,7 @@
 <body>
 <canvas id="view"></canvas>
 <div id="labels"></div>
+<div id="tip"></div>
 
 <div id="top" class="panel">
   <div id="title">holomap</div>
@@ -185,8 +192,8 @@
   <table>
     <tr><td>drag · right-drag · scroll</td><td>turn · move · zoom</td></tr>
     <tr><td>click</td><td>select a room (rooms in front of it fade)</td></tr>
-    <tr><td>double-click</td><td>go inside the room</td></tr>
-    <tr><td>inside</td><td>drag to look, WASD to walk, Q / E down / up, shift faster</td></tr>
+    <tr><td>double-click or Enter</td><td>go inside the room</td></tr>
+    <tr><td>inside</td><td>drag to look, WASD walk, Space jump, shift run, V fly</td></tr>
     <tr><td>Esc</td><td>back out / clear selection</td></tr>
     <tr><td>Layers panel</td><td>drag the band to choose which heights to show</td></tr>
     <tr><td>[ and ]</td><td>layer below / above</td></tr>

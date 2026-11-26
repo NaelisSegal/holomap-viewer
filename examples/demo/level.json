@@ -1,0 +1,2842 @@
+{
+ "name": "The Old Pumping Station",
+ "units": "m",
+ "rooms": [
+  {
+   "name": "Gatehouse",
+   "district": "surface",
+   "tags": [
+    "start"
+   ],
+   "note": "Where the player starts. A small concrete hut over the stairs down.",
+   "links": [
+    "Stairwell",
+    "Back door"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      0,
+      2,
+      0
+     ],
+     "size": [
+      10,
+      4,
+      9
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "bench",
+     "center": [
+      -3,
+      0.25,
+      3.4
+     ],
+     "size": [
+      3,
+      0.5,
+      0.8
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "notice board",
+     "center": [
+      -4.9,
+      1.8,
+      -1
+     ],
+     "size": [
+      0.1,
+      1.2,
+      2
+     ],
+     "color": "#c9a548",
+     "solid": false
+    },
+    {
+     "type": "cylinder",
+     "name": "lamp post",
+     "center": [
+      3.5,
+      1.5,
+      3.2
+     ],
+     "radius": 0.1,
+     "height": 3,
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      -3.5,
+      0.6,
+      -3.0
+     ],
+     "size": [
+      1.2,
+      1.2,
+      1.2
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      -2.1,
+      0.5,
+      -3.0
+     ],
+     "size": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      -3.5,
+      1.8,
+      -2.8
+     ],
+     "size": [
+      1.2,
+      1.2,
+      1.2
+     ],
+     "color": "#a98a62"
+    }
+   ]
+  },
+  {
+   "name": "Stairwell",
+   "district": "pump works",
+   "tags": [
+    "stairs"
+   ],
+   "note": "",
+   "links": [
+    "Gatehouse",
+    "Landing"
+   ],
+   "prims": [
+    {
+     "type": "stairs",
+     "from": [
+      3,
+      0,
+      -1.5
+     ],
+     "to": [
+      19,
+      -8,
+      -1.5
+     ],
+     "steps": 16,
+     "width": 3,
+     "height": 3.6
+    }
+   ],
+   "things": [
+    {
+     "type": "pipe",
+     "name": "handrail",
+     "points": [
+      [
+       3.2,
+       1,
+       -2.9
+      ],
+      [
+       19,
+       -7,
+       -2.9
+      ]
+     ],
+     "radius": 0.05,
+     "color": "#8f979e"
+    }
+   ]
+  },
+  {
+   "name": "Landing",
+   "district": "pump works",
+   "tags": [],
+   "note": "",
+   "links": [
+    "Stairwell",
+    "Service corridor"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      21.5,
+      -6.2,
+      -1.5
+     ],
+     "size": [
+      6,
+      3.6,
+      6
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "fuse box",
+     "center": [
+      24.4,
+      -6.5,
+      -3.5
+     ],
+     "size": [
+      0.3,
+      1.2,
+      0.8
+     ],
+     "color": "#c9a548"
+    }
+   ]
+  },
+  {
+   "name": "Service corridor",
+   "district": "pump works",
+   "tags": [
+    "corridor"
+   ],
+   "note": "",
+   "links": [
+    "Landing",
+    "Pump hall"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      21.5,
+      -6.2,
+      -14.5
+     ],
+     "size": [
+      3.2,
+      3.6,
+      23
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "pipe",
+     "name": "water pipe",
+     "points": [
+      [
+       22.8,
+       -4.8,
+       -4
+      ],
+      [
+       22.8,
+       -4.8,
+       -23
+      ]
+     ],
+     "radius": 0.18,
+     "color": "#9a6a4f"
+    }
+   ]
+  },
+  {
+   "name": "Pump hall",
+   "district": "pump works",
+   "tags": [
+    "big room",
+    "hub"
+   ],
+   "note": "You come in high up on the catwalk. Stairs at the west end lead down to the pumps.",
+   "links": [
+    "Service corridor",
+    "Control room",
+    "Drain tunnel"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      21.5,
+      -14.8,
+      -40.5
+     ],
+     "size": [
+      34,
+      22.4,
+      30
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "catwalk",
+     "center": [
+      21.5,
+      -8.2,
+      -26.3
+     ],
+     "size": [
+      34,
+      0.4,
+      2.6
+     ],
+     "color": "#8f979e"
+    },
+    {
+     "type": "pipe",
+     "name": "catwalk rail",
+     "points": [
+      [
+       5,
+       -7,
+       -27.6
+      ],
+      [
+       38,
+       -7,
+       -27.6
+      ]
+     ],
+     "radius": 0.05,
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "catwalk",
+     "center": [
+      37.2,
+      -8.2,
+      -33
+     ],
+     "size": [
+      2.6,
+      0.4,
+      12
+     ],
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -8.65,
+      -27.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -9.15,
+      -28.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -9.65,
+      -28.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -10.15,
+      -29.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -10.65,
+      -29.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -11.15,
+      -30.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -11.65,
+      -30.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -12.15,
+      -31.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -12.65,
+      -31.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -13.15,
+      -32.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -13.65,
+      -32.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -14.15,
+      -33.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -14.65,
+      -33.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -15.15,
+      -34.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -15.65,
+      -34.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -16.15,
+      -35.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -16.65,
+      -35.95
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -17.15,
+      -36.45
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stair landing",
+     "center": [
+      6.2,
+      -17.2,
+      -38.5
+     ],
+     "size": [
+      2.4,
+      0.4,
+      3
+     ],
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -17.65,
+      -40.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -18.15,
+      -40.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -18.65,
+      -41.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -19.15,
+      -41.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -19.65,
+      -42.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -20.15,
+      -42.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -20.65,
+      -43.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -21.15,
+      -43.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -21.65,
+      -44.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -22.15,
+      -44.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -22.65,
+      -45.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -23.15,
+      -45.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -23.65,
+      -46.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -24.15,
+      -46.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -24.65,
+      -47.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -25.15,
+      -47.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -25.65,
+      -48.25
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "stairs",
+     "center": [
+      6.2,
+      -26.15,
+      -48.75
+     ],
+     "size": [
+      0.55,
+      0.3,
+      2.2
+     ],
+     "color": "#8f979e",
+     "rotate": [
+      0,
+      90.0,
+      0
+     ]
+    },
+    {
+     "type": "cylinder",
+     "name": "pump",
+     "center": [
+      15,
+      -22.5,
+      -44
+     ],
+     "radius": 2.6,
+     "height": 7,
+     "color": "#9a6a4f"
+    },
+    {
+     "type": "cone",
+     "center": [
+      15,
+      -18.1,
+      -44
+     ],
+     "radius": 2.6,
+     "height": 1.8,
+     "color": "#9a6a4f"
+    },
+    {
+     "type": "pipe",
+     "name": "outflow pipe",
+     "points": [
+      [
+       15,
+       -20,
+       -46.4
+      ],
+      [
+       15,
+       -20,
+       -53
+      ],
+      [
+       15,
+       -4.2,
+       -53
+      ]
+     ],
+     "radius": 0.7,
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "pump base",
+     "center": [
+      15,
+      -25.75,
+      -44
+     ],
+     "size": [
+      6.5,
+      0.5,
+      6.5
+     ],
+     "color": "#a39d93"
+    },
+    {
+     "type": "cylinder",
+     "name": "pump",
+     "center": [
+      23.5,
+      -22.5,
+      -44
+     ],
+     "radius": 2.6,
+     "height": 7,
+     "color": "#9a6a4f"
+    },
+    {
+     "type": "cone",
+     "center": [
+      23.5,
+      -18.1,
+      -44
+     ],
+     "radius": 2.6,
+     "height": 1.8,
+     "color": "#9a6a4f"
+    },
+    {
+     "type": "pipe",
+     "name": "outflow pipe",
+     "points": [
+      [
+       23.5,
+       -20,
+       -46.4
+      ],
+      [
+       23.5,
+       -20,
+       -53
+      ],
+      [
+       23.5,
+       -4.2,
+       -53
+      ]
+     ],
+     "radius": 0.7,
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "pump base",
+     "center": [
+      23.5,
+      -25.75,
+      -44
+     ],
+     "size": [
+      6.5,
+      0.5,
+      6.5
+     ],
+     "color": "#a39d93"
+    },
+    {
+     "type": "cylinder",
+     "name": "pump",
+     "center": [
+      32,
+      -22.5,
+      -44
+     ],
+     "radius": 2.6,
+     "height": 7,
+     "color": "#9a6a4f"
+    },
+    {
+     "type": "cone",
+     "center": [
+      32,
+      -18.1,
+      -44
+     ],
+     "radius": 2.6,
+     "height": 1.8,
+     "color": "#9a6a4f"
+    },
+    {
+     "type": "pipe",
+     "name": "outflow pipe",
+     "points": [
+      [
+       32,
+       -20,
+       -46.4
+      ],
+      [
+       32,
+       -20,
+       -53
+      ],
+      [
+       32,
+       -4.2,
+       -53
+      ]
+     ],
+     "radius": 0.7,
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "pump base",
+     "center": [
+      32,
+      -25.75,
+      -44
+     ],
+     "size": [
+      6.5,
+      0.5,
+      6.5
+     ],
+     "color": "#a39d93"
+    },
+    {
+     "type": "box",
+     "name": "workbench",
+     "center": [
+      30,
+      -25.55,
+      -31
+     ],
+     "size": [
+      3,
+      0.9,
+      1.2
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "tool rack",
+     "center": [
+      33,
+      -25,
+      -29.4
+     ],
+     "size": [
+      2.5,
+      2,
+      0.3
+     ],
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      10.0,
+      -25.4,
+      -50.0
+     ],
+     "size": [
+      1.2,
+      1.2,
+      1.2
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      11.4,
+      -25.5,
+      -50.0
+     ],
+     "size": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      10.0,
+      -24.2,
+      -49.8
+     ],
+     "size": [
+      1.2,
+      1.2,
+      1.2
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      11.4,
+      -24.3,
+      -49.8
+     ],
+     "size": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "cylinder",
+     "name": "oil drum",
+     "center": [
+      12.5,
+      -25.4,
+      -31
+     ],
+     "radius": 0.45,
+     "height": 1.2,
+     "color": "#c9a548"
+    },
+    {
+     "type": "cylinder",
+     "name": "oil drum",
+     "center": [
+      13.5,
+      -25.4,
+      -31.4
+     ],
+     "radius": 0.45,
+     "height": 1.2,
+     "color": "#c9a548"
+    }
+   ]
+  },
+  {
+   "name": "Control room",
+   "district": "pump works",
+   "tags": [
+    "room"
+   ],
+   "note": "Looks down over the pump hall from the east catwalk.",
+   "links": [
+    "Pump hall"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      42,
+      -6.2,
+      -36
+     ],
+     "size": [
+      8,
+      3.6,
+      7
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "control desk",
+     "center": [
+      44.5,
+      -7.55,
+      -36
+     ],
+     "size": [
+      1.2,
+      0.9,
+      5
+     ],
+     "color": "#8f979e"
+    },
+    {
+     "type": "box",
+     "name": "chair",
+     "center": [
+      43,
+      -7.6,
+      -35
+     ],
+     "size": [
+      0.6,
+      0.8,
+      0.6
+     ],
+     "color": "#c9a548"
+    },
+    {
+     "type": "box",
+     "name": "chair",
+     "center": [
+      43,
+      -7.6,
+      -37.2
+     ],
+     "size": [
+      0.6,
+      0.8,
+      0.6
+     ],
+     "color": "#c9a548"
+    },
+    {
+     "type": "box",
+     "name": "logbook shelf",
+     "center": [
+      42,
+      -6.8,
+      -39.3
+     ],
+     "size": [
+      3,
+      2.4,
+      0.4
+     ],
+     "color": "#a98a62"
+    }
+   ]
+  },
+  {
+   "name": "Drain tunnel",
+   "district": "cistern",
+   "tags": [
+    "tunnel"
+   ],
+   "note": "A round drain sloping down from the pump hall floor.",
+   "links": [
+    "Pump hall",
+    "Flooded cistern"
+   ],
+   "prims": [
+    {
+     "type": "capsule",
+     "a": [
+      6,
+      -24.5,
+      -52
+     ],
+     "b": [
+      -18,
+      -33.5,
+      -64
+     ],
+     "radius": 2.0
+    }
+   ],
+   "things": []
+  },
+  {
+   "name": "Flooded cistern",
+   "district": "cistern",
+   "tags": [
+    "big room"
+   ],
+   "note": "A wide brick cistern held up by nine pillars, with knee-deep water.",
+   "links": [
+    "Drain tunnel",
+    "Shaft",
+    "Crawlway"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      -30,
+      -32,
+      -64
+     ],
+     "size": [
+      26,
+      8,
+      26
+     ]
+    },
+    {
+     "type": "box",
+     "center": [
+      -38,
+      -33,
+      -72
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -38,
+      -33,
+      -64
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -38,
+      -33,
+      -56
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -30,
+      -33,
+      -72
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -30,
+      -33,
+      -64
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -30,
+      -33,
+      -56
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -22,
+      -33,
+      -72
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -22,
+      -33,
+      -64
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    },
+    {
+     "type": "box",
+     "center": [
+      -22,
+      -33,
+      -56
+     ],
+     "size": [
+      1.6,
+      10,
+      1.6
+     ],
+     "op": "cut"
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "water (knee deep)",
+     "center": [
+      -30,
+      -35.65,
+      -64
+     ],
+     "size": [
+      25.9,
+      0.7,
+      25.9
+     ],
+     "color": "#5f8fa8",
+     "solid": false
+    },
+    {
+     "type": "box",
+     "name": "broken boat",
+     "center": [
+      -25,
+      -34.9,
+      -59
+     ],
+     "size": [
+      1.4,
+      0.6,
+      3.6
+     ],
+     "color": "#a98a62",
+     "rotate": [
+      0,
+      25,
+      4
+     ]
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      -40.5,
+      -35.4,
+      -54.0
+     ],
+     "size": [
+      1.2,
+      1.2,
+      1.2
+     ],
+     "color": "#a98a62"
+    },
+    {
+     "type": "box",
+     "name": "crate",
+     "center": [
+      -39.1,
+      -35.5,
+      -54.0
+     ],
+     "size": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "color": "#a98a62"
+    }
+   ]
+  },
+  {
+   "name": "Crawlway",
+   "district": "cistern",
+   "tags": [
+    "secret"
+   ],
+   "note": "Too low to stand: you have to crawl (fly mode) to get through.",
+   "links": [
+    "Flooded cistern",
+    "Valve room"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      -47.5,
+      -35.2,
+      -64
+     ],
+     "size": [
+      10,
+      1.6,
+      1.6
+     ]
+    }
+   ],
+   "things": []
+  },
+  {
+   "name": "Valve room",
+   "district": "cistern",
+   "tags": [
+    "secret"
+   ],
+   "note": "Hidden room at the end of the crawlway. Turning the valve drains the cistern.",
+   "links": [
+    "Crawlway"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      -55,
+      -34,
+      -64
+     ],
+     "size": [
+      6,
+      4,
+      6
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "cylinder",
+     "name": "big valve wheel",
+     "center": [
+      -57.8,
+      -33.5,
+      -64
+     ],
+     "radius": 1.0,
+     "height": 0.2,
+     "color": "#9a6a4f",
+     "rotate": [
+      0,
+      0,
+      90
+     ]
+    },
+    {
+     "type": "box",
+     "name": "chest",
+     "center": [
+      -54,
+      -35.6,
+      -62
+     ],
+     "size": [
+      1.2,
+      0.8,
+      0.8
+     ],
+     "color": "#c9a548"
+    }
+   ]
+  },
+  {
+   "name": "Shaft",
+   "district": "caves",
+   "tags": [
+    "vertical"
+   ],
+   "note": "A round shaft. Climb the stone steps that spiral up the wall.",
+   "links": [
+    "Flooded cistern",
+    "Overgrown cave"
+   ],
+   "prims": [
+    {
+     "type": "capsule",
+     "a": [
+      -30,
+      -30,
+      -82
+     ],
+     "b": [
+      -30,
+      -6,
+      -82
+     ],
+     "radius": 6
+    },
+    {
+     "type": "box",
+     "center": [
+      -30,
+      -33,
+      -82
+     ],
+     "size": [
+      10.5,
+      6,
+      10.5
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.4,
+      -35.48,
+      -82.0
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -0.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.8,
+      -34.81,
+      -80.12
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -24.1,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -26.93,
+      -34.14,
+      -78.57
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -48.1,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -28.59,
+      -33.48,
+      -77.62
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -72.2,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -30.5,
+      -32.81,
+      -77.43
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -96.3,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -32.32,
+      -32.14,
+      -78.03
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -120.3,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -33.74,
+      -31.47,
+      -79.32
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -144.4,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -34.51,
+      -30.8,
+      -81.08
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -168.4,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -34.49,
+      -30.13,
+      -83.0
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -192.5,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -33.69,
+      -29.47,
+      -84.74
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -216.6,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -32.26,
+      -28.8,
+      -86.01
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -240.6,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -30.42,
+      -28.13,
+      -86.58
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -264.7,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -28.52,
+      -27.46,
+      -86.36
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -288.8,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -26.87,
+      -26.79,
+      -85.37
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -312.8,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.77,
+      -26.12,
+      -83.8
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -336.9,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.4,
+      -25.46,
+      -81.92
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -361.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.83,
+      -24.79,
+      -80.05
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -385.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -26.99,
+      -24.12,
+      -78.52
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -409.1,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -28.67,
+      -23.45,
+      -77.6
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -433.2,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -30.58,
+      -22.78,
+      -77.44
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -457.2,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -32.39,
+      -22.11,
+      -78.07
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -481.3,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -33.78,
+      -21.44,
+      -79.38
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -505.3,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -34.52,
+      -20.78,
+      -81.15
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -529.4,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -34.47,
+      -20.11,
+      -83.07
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -553.5,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -33.65,
+      -19.44,
+      -84.8
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -577.5,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -32.19,
+      -18.77,
+      -86.05
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -601.6,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -30.35,
+      -18.1,
+      -86.59
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -625.7,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -28.45,
+      -17.43,
+      -86.33
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -649.7,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -26.82,
+      -16.77,
+      -85.32
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -673.8,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.74,
+      -16.1,
+      -83.73
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -697.9,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.4,
+      -15.43,
+      -81.85
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -721.9,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -25.87,
+      -14.76,
+      -79.98
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -746.0,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -27.05,
+      -14.09,
+      -78.47
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -770.1,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -28.74,
+      -13.42,
+      -77.58
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -794.1,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -30.65,
+      -12.76,
+      -77.45
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -818.2,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -32.45,
+      -12.09,
+      -78.11
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -842.2,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -33.83,
+      -11.42,
+      -79.45
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -866.3,
+      0
+     ]
+    },
+    {
+     "type": "box",
+     "name": "step",
+     "center": [
+      -34.54,
+      -10.75,
+      -81.23
+     ],
+     "size": [
+      2.2,
+      0.3,
+      2.0
+     ],
+     "color": "#a39d93",
+     "rotate": [
+      0,
+      -890.4,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Overgrown cave",
+   "district": "caves",
+   "tags": [
+    "cave"
+   ],
+   "note": "A natural cave the shaft broke into. Roots come through the roof.",
+   "links": [
+    "Shaft",
+    "Maintenance tunnel"
+   ],
+   "prims": [
+    {
+     "type": "ellipsoid",
+     "center": [
+      -54,
+      -7,
+      -86
+     ],
+     "radii": [
+      17,
+      6.5,
+      11
+     ],
+     "noise": {
+      "amp": 1.6,
+      "freq": 0.12,
+      "octaves": 3
+     }
+    },
+    {
+     "type": "capsule",
+     "a": [
+      -34,
+      -8.5,
+      -83
+     ],
+     "b": [
+      -42,
+      -8.5,
+      -85
+     ],
+     "radius": 2.2
+    }
+   ],
+   "things": [
+    {
+     "type": "sphere",
+     "name": "boulder",
+     "center": [
+      -50,
+      -11.5,
+      -82
+     ],
+     "radius": 1.8,
+     "color": "#a39d93"
+    },
+    {
+     "type": "sphere",
+     "name": "boulder",
+     "center": [
+      -60,
+      -11.8,
+      -91
+     ],
+     "radius": 1.4,
+     "color": "#a39d93"
+    },
+    {
+     "type": "cone",
+     "name": "glow-moss mound",
+     "center": [
+      -56,
+      -11.6,
+      -80
+     ],
+     "radius": 1.6,
+     "height": 1.2,
+     "color": "#7f9a6a"
+    },
+    {
+     "type": "cone",
+     "name": "glow-moss mound",
+     "center": [
+      -46,
+      -11.8,
+      -90
+     ],
+     "radius": 1.2,
+     "height": 0.9,
+     "color": "#7f9a6a"
+    },
+    {
+     "type": "cylinder",
+     "name": "old tree root",
+     "center": [
+      -62,
+      -6,
+      -84
+     ],
+     "radius": 0.5,
+     "radiusTop": 0.25,
+     "height": 9,
+     "color": "#7a5e45",
+     "rotate": [
+      0,
+      0,
+      25
+     ]
+    }
+   ]
+  },
+  {
+   "name": "Maintenance tunnel",
+   "district": "caves",
+   "tags": [
+    "tunnel",
+    "shortcut"
+   ],
+   "note": "A long tunnel slowly rising back towards the gatehouse.",
+   "links": [
+    "Overgrown cave",
+    "Back door"
+   ],
+   "prims": [
+    {
+     "type": "polyline",
+     "radius": 1.8,
+     "points": [
+      [
+       -68,
+       -9.5,
+       -88
+      ],
+      [
+       -74,
+       -8,
+       -70
+      ],
+      [
+       -66,
+       -5.5,
+       -40
+      ],
+      [
+       -40,
+       -2,
+       -18
+      ],
+      [
+       -14,
+       1.4,
+       2
+      ]
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "pipe",
+     "name": "cable",
+     "points": [
+      [
+       -68,
+       -8,
+       -89.5
+      ],
+      [
+       -75.6,
+       -6.4,
+       -70
+      ],
+      [
+       -67.6,
+       -3.9,
+       -40
+      ],
+      [
+       -41,
+       -0.5,
+       -19.5
+      ],
+      [
+       -15,
+       2.9,
+       0.6
+      ]
+     ],
+     "radius": 0.08,
+     "color": "#3b3b3b"
+    }
+   ]
+  },
+  {
+   "name": "Back door",
+   "district": "surface",
+   "tags": [
+    "shortcut"
+   ],
+   "note": "Opens into the gatehouse once unlocked: the shortcut back to the start.",
+   "links": [
+    "Maintenance tunnel",
+    "Gatehouse"
+   ],
+   "prims": [
+    {
+     "type": "box",
+     "center": [
+      -9,
+      1.6,
+      2
+     ],
+     "size": [
+      9,
+      3.6,
+      4
+     ]
+    }
+   ],
+   "things": [
+    {
+     "type": "box",
+     "name": "locked door",
+     "center": [
+      -5.6,
+      1.3,
+      2
+     ],
+     "size": [
+      0.15,
+      2.6,
+      1.6
+     ],
+     "color": "#c9a548",
+     "solid": false,
+     "note": "opens from the gatehouse side"
+    }
+   ]
+  }
+ ]
+}
