@@ -119,6 +119,13 @@
   button.primary:hover { background: #1b5e66; }
   #where button { margin-left: 6px; padding: 1px 8px; }
   #card .contents { margin: 6px 0; color: var(--muted); }
+  /* "just look" mode: hide all the panels */
+  body.clean #top, body.clean #layers, body.clean #right, body.clean #bar,
+  body.clean #where, body.clean #help, body.clean #status, body.clean #labels,
+  body.clean #tip { display: none !important; }
+  #uiBtn { position: fixed; right: 14px; bottom: 14px; display: none; opacity: .55; }
+  #uiBtn:hover { opacity: 1; }
+  body.clean #uiBtn { display: block; }
   #drop { position: fixed; inset: 0; display: none; align-items: center;
     justify-content: center; background: rgba(220,218,213,.8); font-size: 16px;
     pointer-events: none; }
@@ -161,7 +168,7 @@
 
 <div id="right">
   <div id="searchBox" class="panel">
-    <input id="search" type="search" placeholder="Find a room…" autocomplete="off">
+    <input id="search" type="search" placeholder="Find a room or thing…  ( / )" autocomplete="off">
     <div id="results"></div>
   </div>
   <div id="card" class="panel" hidden></div>
@@ -183,6 +190,7 @@
   <div class="grp">
     <button id="labelsBtn">names: on</button>
     <button id="frameBtn" title="F">fit all</button>
+    <button id="hideBtn" title="Hide everything and just look (U)">hide UI</button>
     <button id="helpBtn">?</button>
   </div>
 </div>
@@ -198,9 +206,11 @@
     <tr><td>Layers panel</td><td>drag the band to choose which heights to show</td></tr>
     <tr><td>[ and ]</td><td>layer below / above</td></tr>
     <tr><td>H · F</td><td>all heights · fit all</td></tr>
+    <tr><td>U</td><td>hide / show all the panels</td></tr>
   </table>
 </div>
 <div id="status" class="panel"></div>
+<button id="uiBtn" title="Show the panels again (U)">show UI</button>
 <div id="drop">Drop a map .json to view it</div>
 <script type="module" src="./src/main.js"></script>
 </body>

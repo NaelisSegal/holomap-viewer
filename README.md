@@ -42,6 +42,8 @@ a cave, and a tunnel that loops back to the start.
   it to show only those heights; the 3D view is sliced to match.
 - Colour by height (default), district or room; 3D / top / side views;
   search with `/`.
+- **Hide UI** (button or U) hides every panel so you can just look.
+  Press U again or the small *show UI* button to bring them back.
 
 ## Use it for your own game
 

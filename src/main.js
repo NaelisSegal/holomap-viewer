@@ -820,6 +820,7 @@ addEventListener('keydown', e => {
   }
   if (!S.inside && k === 'Enter' && S.selected) { enterRoom(S.rooms.get(S.selected)); return; }
   if (k === 'Shift') { keys.add(k); return; }
+  if (k === 'u') { toggleUI(); return; }
   if (k === 'f') frameAll();
   else if (k === 'h') setWindow(null);
   else if (k === '[') stepWindow(-1);
@@ -974,25 +975,48 @@ function buildDistricts() {
 }
 
 // ---------- search ----------
+// search matches room names first, then districts, tags and the
+// names of things inside (so "pump" finds the pump hall)
+function matchRoom(r, q) {
+  if (r.name.toLowerCase().includes(q)) return 3;
+  if (r.district.toLowerCase().includes(q)) return 2;
+  if ((r.json.tags || []).some(t => t.toLowerCase().includes(q))) return 2;
+  if ((r.json.things || []).some(t => (t.name || '').toLowerCase().includes(q))) return 1;
+  return 0;
+}
+function searchHits(q) {
+  return S.order.map(n => S.rooms.get(n))
+    .map(r => ({ r, m: q ? matchRoom(r, q) : 3 }))
+    .filter(x => x.m > 0)
+    .sort((a, b) => b.m - a.m)
+    .map(x => x.r);
+}
 function buildResults() {
   const q = $('search').value.trim().toLowerCase();
   const box = $('results');
   box.innerHTML = '';
-  if (document.activeElement !== $('search') && !q) return;
-  let n = 0;
-  for (const name of S.order) {
-    if (q && !name.toLowerCase().includes(q)) continue;
-    const r = S.rooms.get(name);
+  if (document.activeElement !== $('search')) return;
+  const hits = searchHits(q);
+  if (!hits.length) {
+    const d = document.createElement('div'); d.className = 'muted';
+    d.textContent = 'No room matches';
+    box.append(d); return;
+  }
+  for (const r of hits.slice(0, 200)) {
     const d = document.createElement('div');
-    if (name === S.selected) d.className = 'on';
-    const a = document.createElement('span'); a.textContent = name;
+    if (r.name === S.selected) d.className = 'on';
+    const a = document.createElement('span'); a.textContent = r.name;
     const b = document.createElement('span'); b.className = 'd';
     b.textContent = [r.district, r.extent ? 'y ' + fmt(r.extent.min.y) : ''].filter(Boolean).join(' · ');
     d.append(a, b);
-    d.onmousedown = ev => { ev.preventDefault(); goTo(r); };
+    d.onmousedown = ev => { ev.preventDefault(); pickResult(r); };
     box.append(d);
-    if (++n >= 200) break;
   }
+}
+function pickResult(r) {
+  $('search').value = '';
+  $('search').blur();
+  goTo(r);
 }
 function goTo(r) {
   if (!shown(r)) { S.hidden.delete(r.district); buildDistricts(); }
@@ -1005,9 +1029,8 @@ $('search').addEventListener('focus', buildResults);
 $('search').addEventListener('blur', () => setTimeout(() => { $('results').innerHTML = ''; }, 100));
 $('search').addEventListener('keydown', e => {
   if (e.key === 'Enter') {
-    const q = e.target.value.trim().toLowerCase();
-    const name = S.order.find(n => n.toLowerCase().includes(q));
-    if (name) { goTo(S.rooms.get(name)); e.target.blur(); }
+    const hit = searchHits(e.target.value.trim().toLowerCase())[0];
+    if (hit) pickResult(hit);
   }
 });
 
@@ -1142,6 +1165,14 @@ $('labelsBtn').onclick = () => {
   requestRender();
 };
 $('frameBtn').onclick = () => frameAll();
+// hide every panel to just look at the map
+function toggleUI() {
+  document.body.classList.toggle('clean');
+  $('tip').style.display = 'none';
+  requestRender();
+}
+$('hideBtn').onclick = toggleUI;
+$('uiBtn').onclick = toggleUI;
 $('helpBtn').onclick = () => { const h = $('help'); h.style.display = h.style.display === 'block' ? 'none' : 'block'; };
 
 function buildVersions() {
