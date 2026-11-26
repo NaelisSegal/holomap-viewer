@@ -12,6 +12,8 @@ JSON with metres for units, there is a guide written for AI models
 ([AI_GUIDE.md](AI_GUIDE.md)), and a checker that catches the usual
 mistakes. You can also write maps by hand, or make them with code.
 
+**[Try the demo level in your browser](https://naelissegal.github.io/holomap-viewer/)**
+
 ![The demo level: the pump hall with its roof lifted](screenshot.png)
 
 ## Try it
@@ -19,8 +21,8 @@ mistakes. You can also write maps by hand, or make them with code.
 You need Python 3. Nothing to install.
 
 ```sh
-git clone <this repo>
-cd holomap
+git clone https://github.com/NaelisSegal/holomap-viewer
+cd holomap-viewer
 python3 holomap.py
 ```
 
