@@ -6,87 +6,122 @@
 <title>holomap</title>
 <style>
   :root {
-    --bg: #04060c; --panel: rgba(6, 12, 22, .88);
-    --line: rgba(80, 180, 220, .25); --text: #9fdcf0;
-    --dim: #5f93a8; --bright: #d8f4ff; --pick: #ffb347;
+    --bg: #dcdad5;
+    --panel: rgba(255, 255, 255, .94);
+    --border: rgba(30, 36, 48, .12);
+    --text: #1f2430;
+    --muted: #6b7280;
+    --accent: #23707a;
+    --accent-soft: #dcefee;
+    --shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.06);
   }
+  * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100%; background: var(--bg); color: var(--text);
-    font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace;
+    font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     overflow: hidden;
   }
-  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-  #hud {
-    position: fixed; left: 14px; top: 14px; width: 270px;
-    max-height: calc(100% - 28px); display: flex; flex-direction: column;
-    gap: 10px; pointer-events: none;
-  }
+  #view { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
   .panel {
-    pointer-events: auto; background: var(--panel);
-    border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: var(--shadow);
   }
-  h1 {
-    font-size: 14px; margin: 0 0 6px; color: var(--bright);
-    letter-spacing: .08em; text-transform: uppercase;
-  }
-  .row { display: flex; align-items: center; justify-content: space-between;
-    gap: 8px; margin: 4px 0; }
-  .dim { color: var(--dim); }
-  .btns { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
   button {
-    background: transparent; border: 1px solid #2a4a5a; border-radius: 3px;
-    color: var(--text); font: inherit; padding: 1px 7px; cursor: pointer;
+    font: inherit; color: var(--text); background: #fff;
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 3px 9px; cursor: pointer;
   }
-  button.on { background: #1c4a5e; border-color: #4fc3e0; color: #fff; }
-  select {
-    background: #0b1622; border: 1px solid #2a4a5a; border-radius: 3px;
-    color: var(--bright); font: inherit; padding: 1px 4px; max-width: 160px;
-  }
-  #name { color: var(--pick); }
-  #info { white-space: pre-wrap; }
-  #note { color: var(--bright); margin-top: 6px; white-space: pre-wrap; }
-  #links { margin-top: 6px; }
-  #links span { cursor: pointer; text-decoration: underline dotted; margin-right: 8px;
-    display: inline-block; }
-  #links span:hover { color: var(--bright); }
-  #listPanel { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
-  #search {
-    width: 100%; box-sizing: border-box; background: rgba(0, 0, 0, .3);
-    border: 1px solid #2a4a5a; border-radius: 3px; color: var(--bright);
-    font: inherit; padding: 2px 6px; margin-bottom: 4px;
-  }
-  #rooms { overflow: auto; min-height: 40px; max-height: 34vh; }
-  #rooms div { padding: 1px 4px; border-radius: 3px; cursor: pointer;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  #rooms div:hover { background: rgba(80, 180, 220, .15); }
-  #rooms div.on { color: var(--pick); }
-  #rooms .d { color: var(--dim); font-size: 11px; float: right; margin-left: 6px; }
-  #rooms { scrollbar-color: #2a4a5a transparent; scrollbar-width: thin; }
-  kbd { border: 1px solid #2a4a5a; border-radius: 3px; padding: 0 4px; }
-  #help { font-size: 12px; }
-  #status {
-    position: fixed; right: 14px; bottom: 12px; color: var(--dim);
-    text-align: right; white-space: pre-wrap; pointer-events: none;
-  }
-  #status .err { color: #ff8a80; }
-  #where {
-    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
-    color: var(--pick); letter-spacing: .1em; pointer-events: none;
-    text-align: center;
-  }
-  #tip {
-    position: fixed; pointer-events: none; color: var(--bright);
-    background: var(--panel); border: 1px solid var(--line);
-    border-radius: 4px; padding: 1px 6px; display: none; white-space: nowrap;
-  }
-  #drop {
-    position: fixed; inset: 0; display: none; align-items: center;
-    justify-content: center; background: rgba(4, 6, 12, .7);
-    color: var(--bright); font-size: 16px; pointer-events: none;
-  }
-  @media (max-width: 600px) {
-    #hud { width: calc(100% - 28px); }
-    #listPanel { display: none; }
+  button:hover { border-color: rgba(30,36,48,.3); }
+  .seg { display: inline-flex; border: 1px solid var(--border); border-radius: 7px;
+    overflow: hidden; background: #fff; }
+  .seg button { border: none; border-radius: 0; padding: 4px 10px; }
+  .seg button + button { border-left: 1px solid var(--border); }
+  .seg button.on { background: var(--accent); color: #fff; }
+  .muted { color: var(--muted); }
+  .label-sm { font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: .06em; }
+
+  /* top left: map name and versions */
+  #top { position: fixed; left: 14px; top: 14px; padding: 10px 12px;
+    display: flex; align-items: center; gap: 12px; max-width: calc(100% - 380px); }
+  #title { font-weight: 600; font-size: 15px; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+
+  /* left: layers */
+  #layers { position: fixed; left: 14px; top: 70px; width: 250px; padding: 10px 12px;
+    max-height: calc(100% - 150px); overflow: auto; }
+  #layers h2, #card h2 { margin: 0; font-size: 13px; font-weight: 600; }
+  .head { display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px; gap: 6px; }
+  #elev { display: block; width: 100%; height: 330px; cursor: ns-resize;
+    border-radius: 6px; background: #f3f2ef; touch-action: none; }
+  #range { margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .btnrow { display: flex; gap: 6px; margin-top: 6px; }
+  .btnrow button { flex: 1; }
+  #districts { margin-top: 10px; }
+  #districts label { display: flex; align-items: center; gap: 6px; padding: 1px 0;
+    cursor: pointer; }
+  .chip { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  /* right: search and room card */
+  #right { position: fixed; right: 14px; top: 14px; width: 300px;
+    display: flex; flex-direction: column; gap: 10px; max-height: calc(100% - 100px); }
+  #searchBox { padding: 8px; position: relative; }
+  #search { width: 100%; font: inherit; padding: 6px 9px; border-radius: 6px;
+    border: 1px solid var(--border); outline: none; }
+  #search:focus { border-color: var(--accent); }
+  #results { margin-top: 6px; max-height: 280px; overflow: auto; }
+  #results:empty { display: none; }
+  #results div { padding: 4px 8px; border-radius: 5px; cursor: pointer;
+    display: flex; justify-content: space-between; gap: 8px; }
+  #results div:hover, #results div.on { background: var(--accent-soft); }
+  #results .d { color: var(--muted); font-size: 12px; white-space: nowrap; }
+  #card { padding: 12px 14px; overflow: auto; }
+  #card[hidden] { display: none; }
+  #card .name { font-size: 16px; font-weight: 600; margin: 0 0 2px; }
+  #card dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 8px 0; }
+  #card dt { color: var(--muted); }
+  #card dd { margin: 0; font-variant-numeric: tabular-nums; }
+  #card .tags span { display: inline-block; background: #eef0f3; border-radius: 4px;
+    padding: 0 6px; margin: 0 4px 4px 0; font-size: 12px; }
+  #card .note { margin: 8px 0; white-space: pre-wrap; }
+  #card .links span { display: inline-block; color: var(--accent); cursor: pointer;
+    margin: 0 10px 4px 0; text-decoration: underline; text-underline-offset: 2px; }
+  #card .links span.missing { color: var(--muted); cursor: default; text-decoration: none; }
+
+  /* bottom toolbar */
+  #bar { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+    padding: 7px 10px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    justify-content: center; max-width: calc(100% - 28px); }
+  #bar .grp { display: flex; align-items: center; gap: 6px; }
+
+  #where { position: fixed; left: 50%; bottom: 66px; transform: translateX(-50%);
+    padding: 6px 12px; display: none; text-align: center; }
+  #status { position: fixed; right: 14px; bottom: 14px; max-width: 320px;
+    padding: 6px 10px; display: none; white-space: pre-wrap; font-size: 12px; }
+  #status .err { color: #b42318; }
+  #help { position: fixed; left: 50%; bottom: 66px; transform: translateX(-50%);
+    padding: 10px 14px; display: none; width: 360px; }
+  #help table { border-collapse: collapse; width: 100%; }
+  #help td { padding: 2px 0; }
+  #help td:first-child { color: var(--muted); padding-right: 12px; white-space: nowrap; }
+
+  /* room name labels in the 3D view */
+  #labels { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+  #labels div { position: absolute; transform: translate(-50%, -100%);
+    background: rgba(255,255,255,.9); border: 1px solid var(--border);
+    border-radius: 5px; padding: 0 6px; font-size: 12px; white-space: nowrap; }
+  #labels div.sel { background: var(--text); color: #fff; border-color: var(--text); }
+
+  #drop { position: fixed; inset: 0; display: none; align-items: center;
+    justify-content: center; background: rgba(220,218,213,.8); font-size: 16px;
+    pointer-events: none; }
+
+  @media (max-width: 800px) {
+    #layers { width: 200px; }
+    #elev { height: 220px; }
+    #right { width: 240px; }
+    #top { max-width: calc(100% - 28px); }
   }
 </style>
 <script type="importmap">
@@ -97,40 +132,69 @@
 </script>
 </head>
 <body>
-<canvas id="c"></canvas>
-<div id="hud">
-  <div class="panel">
-    <h1 id="title">holomap</h1>
-    <div class="row" id="versionRow" hidden><span class="dim">version</span>
-      <span class="btns" id="versions"></span></div>
-    <div class="row" id="districtRow" hidden><span class="dim">district</span>
-      <select id="district"><option value="">all</option></select></div>
-    <div class="row"><span class="dim">look</span>
-      <span class="btns" id="looks">
-        <button data-look="wireframe" class="on">wireframe</button>
-        <button data-look="washed">washed</button>
-      </span></div>
+<canvas id="view"></canvas>
+<div id="labels"></div>
+
+<div id="top" class="panel">
+  <div id="title">holomap</div>
+  <div class="seg" id="versions"></div>
+</div>
+
+<div id="layers" class="panel">
+  <div class="head"><h2>Layers</h2><span class="muted" id="sideName">side view</span></div>
+  <canvas id="elev"></canvas>
+  <div id="range" class="muted"></div>
+  <div class="btnrow">
+    <button id="down" title="Show the layer below ( [ )">▼ down</button>
+    <button id="up" title="Show the layer above ( ] )">▲ up</button>
+    <button id="all" title="Show every height (H)">all</button>
   </div>
-  <div class="panel">
-    <div id="name">nothing selected</div>
-    <div id="info" class="dim">click a room</div>
-    <div id="note"></div>
-    <div id="links"></div>
+  <div id="districts"></div>
+</div>
+
+<div id="right">
+  <div id="searchBox" class="panel">
+    <input id="search" type="search" placeholder="Find a room…" autocomplete="off">
+    <div id="results"></div>
   </div>
-  <div class="panel" id="listPanel">
-    <input id="search" type="search" placeholder="search rooms" autocomplete="off">
-    <div id="rooms"></div>
-  </div>
-  <div class="panel dim" id="help">
-    click select · <kbd>dbl-click</kbd> go inside · <kbd>Esc</kbd> back out<br>
-    inside: drag look · <kbd>WASD</kbd> move · <kbd>Q</kbd>/<kbd>E</kbd> down/up<br>
-    <kbd>F</kbd> frame all · <kbd>I</kbd> isolate · <kbd>shift</kbd>+scroll cut
+  <div id="card" class="panel" hidden></div>
+</div>
+
+<div id="bar" class="panel">
+  <div class="grp"><span class="label-sm">colour</span>
+    <div class="seg" id="colourBy">
+      <button data-v="height" class="on">height</button>
+      <button data-v="district">district</button>
+      <button data-v="room">room</button>
+    </div></div>
+  <div class="grp"><span class="label-sm">view</span>
+    <div class="seg" id="views">
+      <button data-v="3d">3D</button>
+      <button data-v="top">top</button>
+      <button data-v="side">side</button>
+    </div></div>
+  <div class="grp">
+    <button id="labelsBtn">names: on</button>
+    <button id="frameBtn" title="F">fit all</button>
+    <button id="helpBtn">?</button>
   </div>
 </div>
-<div id="status"></div>
-<div id="where"></div>
-<div id="tip"></div>
-<div id="drop">drop a map .json to view it</div>
+
+<div id="where" class="panel"></div>
+<div id="help" class="panel">
+  <table>
+    <tr><td>drag · right-drag · scroll</td><td>turn · move · zoom</td></tr>
+    <tr><td>click</td><td>select a room (rooms in front of it fade)</td></tr>
+    <tr><td>double-click</td><td>go inside the room</td></tr>
+    <tr><td>inside</td><td>drag to look, WASD to walk, Q / E down / up, shift faster</td></tr>
+    <tr><td>Esc</td><td>back out / clear selection</td></tr>
+    <tr><td>Layers panel</td><td>drag the band to choose which heights to show</td></tr>
+    <tr><td>[ and ]</td><td>layer below / above</td></tr>
+    <tr><td>H · F</td><td>all heights · fit all</td></tr>
+  </table>
+</div>
+<div id="status" class="panel"></div>
+<div id="drop">Drop a map .json to view it</div>
 <script type="module" src="./src/main.js"></script>
 </body>
 </html>

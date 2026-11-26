@@ -5,8 +5,13 @@ import { compileRoom } from './shapes.js';
 
 const MAX_SAMPLES = 2_500_000;
 
-export function meshRoom(roomJson, detail = 1) {
+// neighbours: rooms that overlap this one. Where this room's surface
+// lies inside a neighbour, it is left out, so rooms open into each
+// other like real doorways instead of being sealed boxes.
+export function meshRoom(roomJson, neighbours = [], detail = 1) {
   const room = compileRoom(roomJson);
+  const others = [];
+  for (const n of neighbours) { try { others.push(compileRoom(n)); } catch (e) {} }
   const { min, max } = room.bbox;
   const ext = Math.max(max[0] - min[0], max[1] - min[1], max[2] - min[2]);
 
@@ -87,10 +92,12 @@ export function meshRoom(roomJson, detail = 1) {
           oy + (j + ay / n) * vs,
           oz + (k + az / n) * vs,
         );
-        // gradient points from the room out into the rock
-        let gx = (cv[1] - cv[0]) + (cv[3] - cv[2]) + (cv[5] - cv[4]) + (cv[7] - cv[6]);
-        let gy = (cv[2] - cv[0]) + (cv[3] - cv[1]) + (cv[6] - cv[4]) + (cv[7] - cv[5]);
-        let gz = (cv[4] - cv[0]) + (cv[5] - cv[1]) + (cv[6] - cv[2]) + (cv[7] - cv[3]);
+        // normal from the exact shape, so lighting is smooth
+        const px = pos[pos.length - 3], py = pos[pos.length - 2], pz = pos[pos.length - 1];
+        const hh = vs * 0.5;
+        const gx = room.eval(px + hh, py, pz) - room.eval(px - hh, py, pz);
+        const gy = room.eval(px, py + hh, pz) - room.eval(px, py - hh, pz);
+        const gz = room.eval(px, py, pz + hh) - room.eval(px, py, pz - hh);
         const gl = Math.hypot(gx, gy, gz) || 1;
         nor.push(gx / gl, gy / gl, gz / gl);
         cellVert[i + j * cx + k * cx * cy] = pos.length / 3 - 1;
@@ -98,13 +105,58 @@ export function meshRoom(roomJson, detail = 1) {
     }
   }
 
-  // two triangles for every grid edge that crosses the surface
+  // how far each surface point is outside the other rooms
+  // (negative = inside another room's space)
+  const nv = pos.length / 3;
+  const ov = new Float32Array(nv).fill(1e9);
+  if (others.length) {
+    for (let v = 0; v < nv; v++) {
+      const x = pos[v * 3], y = pos[v * 3 + 1], z = pos[v * 3 + 2];
+      for (const o of others) {
+        const b = o.bbox;
+        if (x < b.min[0] || y < b.min[1] || z < b.min[2]
+          || x > b.max[0] || y > b.max[1] || z > b.max[2]) continue;
+        const d = o.eval(x, y, z);
+        if (d < ov[v]) ov[v] = d;
+      }
+    }
+  }
+
+  // two triangles for every grid edge that crosses the surface;
+  // triangles that reach into another room are cut cleanly where
+  // that room starts, so doorways have smooth edges
   const idx = [];
   const cell = (i, j, k) => cellVert[i + j * cx + k * cx * cy];
+  const extraOv = [];
+  const ovOf = v => (v < nv ? ov[v] : extraOv[v - nv]);
+  const cut = (a, b) => { // new point where ov = 0 between a and b
+    const da = ovOf(a), db = ovOf(b), t = da / (da - db);
+    const n = pos.length / 3;
+    for (let q = 0; q < 3; q++) {
+      pos.push(pos[a * 3 + q] + (pos[b * 3 + q] - pos[a * 3 + q]) * t);
+      nor.push(nor[a * 3 + q] + (nor[b * 3 + q] - nor[a * 3 + q]) * t);
+    }
+    extraOv.push(0);
+    return n;
+  };
+  const tri = (a, b, c) => {
+    const ka = ovOf(a) > 0, kb = ovOf(b) > 0, kc = ovOf(c) > 0;
+    const n = ka + kb + kc;
+    if (n === 3) { idx.push(a, b, c); return; }
+    if (n === 0) return;
+    // rotate so the odd one out comes first
+    let A = a, B = b, C = c, kA = ka;
+    if (kb !== ka && kb !== kc) { A = b; B = c; C = a; kA = kb; }
+    else if (kc !== ka && kc !== kb) { A = c; B = a; C = b; kA = kc; }
+    const ab = cut(A, B), ac = cut(A, C);
+    if (kA) idx.push(A, ab, ac);          // only A is kept
+    else idx.push(ab, B, C, ab, C, ac);   // A is dropped
+  };
   const quad = (a, b, c, d, flip) => {
     if (a < 0 || b < 0 || c < 0 || d < 0) return;
-    if (flip) idx.push(a, c, b, a, d, c);
-    else idx.push(a, b, c, a, c, d);
+    // wind the triangles so their front faces point out of the room
+    if (flip) { tri(a, b, c); tri(a, c, d); }
+    else { tri(a, c, b); tri(a, d, c); }
   };
   // (the 2-cell padding keeps the surface away from the grid edge)
   for (let k = 1; k < cz; k++) {

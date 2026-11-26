@@ -1,33 +1,33 @@
 # holomap
 
 A 3D map viewer for games with tangled, layered spaces: caves,
-underground halls, floating platforms, shafts and tunnels. Think of
-the 3D maps in Metroid Prime. You describe rooms as simple shapes in
-a JSON file, and holomap shows them as a see-through holographic map
-that you can fly around and step inside.
-
-**[Try the demo](https://naelissegal.github.io/holomap-viewer/)**
+underground halls, floating platforms, shafts and tunnels. You
+describe rooms as simple shapes in a JSON file, and holomap shows
+them as a solid model you can turn around, slice by height and walk
+inside.
 
 ![holomap showing the demo map](screenshot.png)
 
 ## What it does
 
-- **See-through rooms** with metre grid lines, in two looks:
-  *wireframe* and *washed*.
-- **Go inside a room** (double-click). You look around from inside,
-  move with WASD, and you can't fall out through the walls. Walk
-  through a doorway or a shaft and you're in the next room.
-- **Room cards** with size, floor height, tags, notes and links to
-  other rooms.
-- **Districts, search, isolate** (I) and a **section cut**
-  (shift + scroll) to slice the map from the top.
-- **Versions**: switch between several files of the same place
-  (before / after, or different drafts).
+- **Solid rooms, coloured by height.** Low is cool blue, high is
+  warm red, in bands about one storey tall, so you can see at a
+  glance which rooms sit at the same depth. You can also colour by
+  district or by room.
+- **Layers panel.** A side view of the whole map with a height
+  ruler. Drag a band over it to show only those heights; the 3D view
+  is sliced to match, so you look straight into the rooms on that
+  layer. Step up and down with the buttons or `[` and `]`.
+- **Select a room** and everything else goes pale; rooms in front of
+  it fade so you can see it. The card shows its height, size, notes
+  and the rooms it connects to.
+- **Go inside** (double-click). Walk with WASD. Rooms open into each
+  other where their shapes meet, so doorways and shafts are real
+  openings, and you walk on into the next room. Walls stop you.
+- **Names** on the rooms, top / side / 3D views, district filters,
+  search.
+- **Versions**: switch between several files of the same place.
 - **Live editing**: save the JSON and the map updates by itself.
-  Only the rooms you changed are rebuilt.
-- Works with big worlds. Each room gets its own detail level, the
-  shapes are built in the background, and the page only draws when
-  something changes.
 
 ## Use it with your own maps
 
@@ -50,15 +50,16 @@ See [FORMAT.md](FORMAT.md) for how to write a map. The demo in
 
 | do this              | to |
 | -------------------- | -- |
-| drag / scroll        | turn and zoom |
+| drag · right-drag · scroll | turn · move · zoom |
 | click                | select a room |
 | double-click         | go inside |
-| Esc                  | back out |
-| WASD, Q / E          | move, down / up (inside) |
+| Esc                  | back out / clear selection |
+| WASD, Q / E          | walk, down / up (inside) |
 | shift                | move faster |
-| F                    | frame the whole map |
-| I                    | isolate the selected room |
-| shift + scroll       | section cut |
+| `[` and `]`          | layer below / above |
+| H                    | all heights |
+| F                    | fit the whole map |
+| /                    | search |
 
 ## Licence
 

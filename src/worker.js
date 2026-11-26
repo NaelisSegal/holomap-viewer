@@ -3,9 +3,9 @@ import { meshRoom } from './mesher.js';
 
 self.onmessage = e => {
   const { job, rooms } = e.data;
-  for (const { key, room } of rooms) {
+  for (const { key, room, neighbours } of rooms) {
     try {
-      const m = meshRoom(room);
+      const m = meshRoom(room, neighbours || []);
       self.postMessage({ job, key, mesh: m },
         [m.positions.buffer, m.normals.buffer, m.indices.buffer]);
     } catch (err) {
