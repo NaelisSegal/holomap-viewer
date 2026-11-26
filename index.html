@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>holomap</title>
+<style>
+  :root {
+    --bg: #04060c; --panel: rgba(6, 12, 22, .88);
+    --line: rgba(80, 180, 220, .25); --text: #9fdcf0;
+    --dim: #5f93a8; --bright: #d8f4ff; --pick: #ffb347;
+  }
+  html, body {
+    margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace;
+    overflow: hidden;
+  }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  #hud {
+    position: fixed; left: 14px; top: 14px; width: 270px;
+    max-height: calc(100% - 28px); display: flex; flex-direction: column;
+    gap: 10px; pointer-events: none;
+  }
+  .panel {
+    pointer-events: auto; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px;
+  }
+  h1 {
+    font-size: 14px; margin: 0 0 6px; color: var(--bright);
+    letter-spacing: .08em; text-transform: uppercase;
+  }
+  .row { display: flex; align-items: center; justify-content: space-between;
+    gap: 8px; margin: 4px 0; }
+  .dim { color: var(--dim); }
+  .btns { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+  button {
+    background: transparent; border: 1px solid #2a4a5a; border-radius: 3px;
+    color: var(--text); font: inherit; padding: 1px 7px; cursor: pointer;
+  }
+  button.on { background: #1c4a5e; border-color: #4fc3e0; color: #fff; }
+  select {
+    background: #0b1622; border: 1px solid #2a4a5a; border-radius: 3px;
+    color: var(--bright); font: inherit; padding: 1px 4px; max-width: 160px;
+  }
+  #name { color: var(--pick); }
+  #info { white-space: pre-wrap; }
+  #note { color: var(--bright); margin-top: 6px; white-space: pre-wrap; }
+  #links { margin-top: 6px; }
+  #links span { cursor: pointer; text-decoration: underline dotted; margin-right: 8px;
+    display: inline-block; }
+  #links span:hover { color: var(--bright); }
+  #listPanel { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
+  #search {
+    width: 100%; box-sizing: border-box; background: rgba(0, 0, 0, .3);
+    border: 1px solid #2a4a5a; border-radius: 3px; color: var(--bright);
+    font: inherit; padding: 2px 6px; margin-bottom: 4px;
+  }
+  #rooms { overflow: auto; min-height: 40px; max-height: 34vh; }
+  #rooms div { padding: 1px 4px; border-radius: 3px; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #rooms div:hover { background: rgba(80, 180, 220, .15); }
+  #rooms div.on { color: var(--pick); }
+  #rooms .d { color: var(--dim); font-size: 11px; float: right; margin-left: 6px; }
+  #rooms { scrollbar-color: #2a4a5a transparent; scrollbar-width: thin; }
+  kbd { border: 1px solid #2a4a5a; border-radius: 3px; padding: 0 4px; }
+  #help { font-size: 12px; }
+  #status {
+    position: fixed; right: 14px; bottom: 12px; color: var(--dim);
+    text-align: right; white-space: pre-wrap; pointer-events: none;
+  }
+  #status .err { color: #ff8a80; }
+  #where {
+    position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%);
+    color: var(--pick); letter-spacing: .1em; pointer-events: none;
+    text-align: center;
+  }
+  #tip {
+    position: fixed; pointer-events: none; color: var(--bright);
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 4px; padding: 1px 6px; display: none; white-space: nowrap;
+  }
+  #drop {
+    position: fixed; inset: 0; display: none; align-items: center;
+    justify-content: center; background: rgba(4, 6, 12, .7);
+    color: var(--bright); font-size: 16px; pointer-events: none;
+  }
+  @media (max-width: 600px) {
+    #hud { width: calc(100% - 28px); }
+    #listPanel { display: none; }
+  }
+</style>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="hud">
+  <div class="panel">
+    <h1 id="title">holomap</h1>
+    <div class="row" id="versionRow" hidden><span class="dim">version</span>
+      <span class="btns" id="versions"></span></div>
+    <div class="row" id="districtRow" hidden><span class="dim">district</span>
+      <select id="district"><option value="">all</option></select></div>
+    <div class="row"><span class="dim">look</span>
+      <span class="btns" id="looks">
+        <button data-look="wireframe" class="on">wireframe</button>
+        <button data-look="washed">washed</button>
+      </span></div>
+  </div>
+  <div class="panel">
+    <div id="name">nothing selected</div>
+    <div id="info" class="dim">click a room</div>
+    <div id="note"></div>
+    <div id="links"></div>
+  </div>
+  <div class="panel" id="listPanel">
+    <input id="search" type="search" placeholder="search rooms" autocomplete="off">
+    <div id="rooms"></div>
+  </div>
+  <div class="panel dim" id="help">
+    click select · <kbd>dbl-click</kbd> go inside · <kbd>Esc</kbd> back out<br>
+    inside: drag look · <kbd>WASD</kbd> move · <kbd>Q</kbd>/<kbd>E</kbd> down/up<br>
+    <kbd>F</kbd> frame all · <kbd>I</kbd> isolate · <kbd>shift</kbd>+scroll cut
+  </div>
+</div>
+<div id="status"></div>
+<div id="where"></div>
+<div id="tip"></div>
+<div id="drop">drop a map .json to view it</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

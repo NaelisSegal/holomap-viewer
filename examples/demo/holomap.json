@@ -1,0 +1,12 @@
+{
+ "maps": [
+  {
+   "file": "before.json",
+   "label": "before"
+  },
+  {
+   "file": "after.json",
+   "label": "after"
+  }
+ ]
+}
