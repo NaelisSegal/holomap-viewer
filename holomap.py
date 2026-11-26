@@ -6,7 +6,8 @@
 Serves the viewer and the .json maps in that folder, then opens
 your browser. Edit a map and save: the page updates by itself.
 The order of versions comes from holomap.json in the folder if it
-is there (see FORMAT.md), otherwise every .json file, sorted.
+is there (see FORMAT.md), otherwise every .json map, sorted, plus
+any .glb / .gltf level model that no map uses.
 """
 import http.server, json, os, sys, threading, webbrowser
 from functools import partial
@@ -20,8 +21,18 @@ def map_list(folder):
         with open(cfg, encoding="utf-8") as f:
             return json.load(f).get("maps", [])
     skip = {"holomap.json", "index.json"}
-    return sorted(n for n in os.listdir(folder)
-                  if n.endswith(".json") and n not in skip)
+    names = sorted(os.listdir(folder))
+    maps = [n for n in names if n.endswith(".json") and n not in skip]
+    # a level model is listed on its own only if no map uses it
+    used = set()
+    for n in maps:
+        try:
+            with open(os.path.join(folder, n), encoding="utf-8") as f:
+                used |= {m.get("file") for m in json.load(f).get("models", [])}
+        except Exception:
+            pass
+    return maps + [n for n in names
+                   if n.lower().endswith((".glb", ".gltf")) and n not in used]
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):

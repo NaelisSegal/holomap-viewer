@@ -82,6 +82,43 @@ video game level, not a set of boxes.
   hanging cables, notices on walls). Pipes are not solid unless you
   say so.
 
+## Mapping a level that already exists in a game
+
+Sometimes you are asked to map a level from a game's codebase rather
+than invent one.
+
+1. **Find the level data.** Look for scene and level files: Godot
+   `.tscn` / `.tres`, Unity `.unity` scenes and `.prefab` files (text
+   YAML), Tiled `.tmx` / `.json`, LDtk `.ldtk`, or the game's own
+   level formats and generator code. Read how the game places rooms,
+   walls, floors, doors and props.
+2. **Keep the game's coordinates.** Use the same positions and sizes,
+   so a point in holomap matches the same point in the game. Convert
+   to metres with y up:
+   - Godot: metres, y up. Use as is.
+   - Unity: metres, y up. Unity's z is forward and the scene is
+     left-handed, so flip z (z = -z) to match glTF exports.
+   - Unreal: centimetres, **z up**. Divide by 100, use Unreal z as y,
+     and Unreal y as z.
+   - Blender: metres, **z up**. Use Blender z as y, and -y as z.
+   - 2D tile maps: x and y tiles become x and z, times the tile size
+     in metres. Give floors a y from the layer or level number.
+3. **Describe the space, not the walls.** The game stores walls and
+   floors, but a holomap room is the open space between them. A
+   corridor between two walls becomes one box the width of the gap.
+4. **Name rooms the way the game does,** using the scene, node or
+   area names, so the person can find them in their project. Put the
+   source in the note (for example "from `levels/castle.tscn`, node
+   `Hall`").
+5. **Add things** for important props: doors, switches, chests,
+   enemies' spawn points, save points. Use the game's names for them.
+6. **If there is an exported `.glb` of the level,** reference it with
+   `"models": [{ "file": "level.glb" }]` and write the rooms as named
+   areas over it. They don't need to overlap then, because the model
+   decides where a player can walk.
+7. **Say what you guessed.** If the code doesn't give a size or a
+   height, pick a sensible one and list those guesses in your reply.
+
 ## Before you hand it over
 
 Run the checker and fix every error:

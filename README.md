@@ -2,17 +2,25 @@
 
 A 3D map viewer for game levels with tangled, layered spaces: caves,
 underground halls, shafts, catwalks, tunnels, floating platforms.
-You describe the level in a JSON file (rooms made of simple shapes,
-plus the things inside them), and holomap shows it as a solid model
-that you can turn around, slice by height, and **walk around inside
-like a player**.
+It shows a level as a solid model that you can turn around, slice by
+height, and **walk around inside like a player**.
+
+It works for both kinds of level:
+
+- **Levels you are planning.** Describe them in a JSON file: rooms
+  made of simple shapes, plus the things inside them.
+- **Levels already in your game.** Export the level from your engine
+  as a `.glb` and open it, then put names, notes and links on its
+  areas. Or have an AI read your game's code and scene files and
+  write the map for you.
 
 It is made so that an **AI can write the maps**: the format is plain
 JSON with metres for units, there is a guide written for AI models
 ([AI_GUIDE.md](AI_GUIDE.md)), and a checker that catches the usual
 mistakes. You can also write maps by hand, or make them with code.
 
-**[Try the demo level in your browser](https://naelissegal.github.io/holomap-viewer/)**
+**Try it in your browser:** [a planned level](https://naelissegal.github.io/holomap-viewer/)
+· [an exported level with named areas](https://naelissegal.github.io/holomap-viewer/?maps=examples/built-level/)
 
 ![The demo level: the pump hall with its roof lifted](screenshot.png)
 
@@ -46,6 +54,60 @@ a cave, and a tunnel that loops back to the start.
   search with `/`.
 - **Hide UI** (button or U) hides every panel so you can just look.
   Press U again or the small *show UI* button to bring them back.
+
+## A level that's already in your game
+
+### Export it from your engine
+
+Every engine can export a level as glTF (`.glb`), the standard 3D file
+format:
+
+| engine  | how |
+| ------- | --- |
+| Godot   | open the level scene, *Scene > Export As… > glTF 2.0 Scene* |
+| Unity   | add the free [UnityGLTF](https://github.com/KhronosGroup/UnityGLTF) package, select the level, *Assets > UnityGLTF > Export selected as GLB* |
+| Unreal  | turn on the *glTF Exporter* plugin, select the level's actors, *File > Export Selected…* and pick `.glb` |
+| Blender | *File > Export > glTF 2.0 (.glb)* |
+
+Put the `.glb` in your maps folder. It shows up in holomap on its own,
+and you can walk around in it straight away (double-click where you
+want to stand). Colour it by height to see its layers, or by *own
+colours* to see its real materials.
+
+To name its areas, write a small map next to it that points at the
+model and marks the areas with shapes:
+
+```json
+{
+  "name": "Hillside Ruin",
+  "models": [ { "file": "ruin.glb" } ],
+  "rooms": [
+    { "name": "Cellar", "note": "Barrels and a crate.", "links": ["Cellar steps"],
+      "prims": [ { "type": "box", "center": [10, -2.25, -1], "size": [12, 3.5, 18] } ] }
+  ]
+}
+```
+
+On a model, rooms are **named areas**. They aren't drawn as solid
+blocks: the model's own walls and floors are what you see and walk on.
+An area is tinted when you select it, its roof lifts so you can look
+in, and it gets a card, a name label and a place in search. The full
+example is in [`examples/built-level/`](examples/built-level/).
+
+If your engine uses other units or axes, fix them with `scale`,
+`rotate` and `position` on the model (see [FORMAT.md](FORMAT.md)).
+For example, an Unreal export in centimetres needs `"scale": 0.01`.
+
+### Or let an AI map it from your code
+
+Give an AI coding assistant your game's project, plus
+[AI_GUIDE.md](AI_GUIDE.md), and ask it to map a level. It reads the
+scene and level files (Godot `.tscn`, Unity `.unity` / prefabs, Tiled
+maps, your own level data) and writes the holomap JSON with the
+game's real positions and sizes. This works even when the level
+can't be exported, and it can add notes about what happens where.
+You can combine both: export the `.glb`, and have the AI write the
+named areas on top.
 
 ## Use it for your own game
 
@@ -120,7 +182,8 @@ flights of stairs and spiral steps up a shaft. Run it to rebuild
 ### Let an AI make the map
 
 Give your AI model [AI_GUIDE.md](AI_GUIDE.md) and describe the
-level you want. The guide explains the format, the rules that keep
+level you want, or point it at your game's code to map a level that
+already exists. The guide explains the format, the rules that keep
 rooms connected and walkable, and asks the model to run the checker.
 Keep holomap open on the folder and walk through each version as it
 arrives.

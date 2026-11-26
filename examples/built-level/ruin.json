@@ -1,0 +1,54 @@
+{
+ "name": "Hillside Ruin (exported level + named areas)",
+ "units": "m",
+ "models": [ { "file": "ruin.glb" } ],
+ "rooms": [
+  {
+   "name": "Courtyard", "district": "outside", "tags": ["start"],
+   "note": "Open courtyard inside the walls. The well and the cellar steps are here.",
+   "links": ["Gate", "Tower, ground floor", "Cellar steps"],
+   "prims": [
+    { "type": "box", "center": [0, 2, 0], "size": [38, 4, 38] },
+    { "type": "box", "op": "cut", "center": [-11, 2, -11], "size": [10.4, 4.2, 10.4] }
+   ]
+  },
+  {
+   "name": "Gate", "district": "outside",
+   "note": "The only way in from outside the walls.",
+   "links": ["Courtyard"],
+   "prims": [ { "type": "box", "center": [0, 1.6, 21.5], "size": [4, 3.2, 3] } ]
+  },
+  {
+   "name": "Tower, ground floor", "district": "tower",
+   "note": "Wooden stairs climb the west wall to the upper floor.",
+   "links": ["Courtyard", "Tower, upper floor"],
+   "prims": [ { "type": "box", "center": [-11, 2, -11], "size": [8.4, 4, 8.4] } ]
+  },
+  {
+   "name": "Tower, upper floor", "district": "tower",
+   "note": "Lookout room. A door opens onto the balcony.",
+   "links": ["Tower, ground floor", "Balcony"],
+   "prims": [ { "type": "box", "center": [-11, 6.5, -11], "size": [8.4, 4.2, 8.4] } ]
+  },
+  {
+   "name": "Balcony", "district": "tower",
+   "note": "Looks out over the courtyard.",
+   "links": ["Tower, upper floor"],
+   "prims": [ { "type": "box", "center": [-4.5, 5.5, -11], "size": [3, 2.2, 6] } ]
+  },
+  {
+   "name": "Cellar steps", "district": "cellar",
+   "links": ["Courtyard", "Cellar"],
+   "prims": [ { "type": "box", "center": [9.5, -1.5, -1], "size": [3, 5, 10] } ]
+  },
+  {
+   "name": "Cellar", "district": "cellar",
+   "note": "Barrels and a crate. Cool and dark.",
+   "links": ["Cellar steps"],
+   "prims": [ { "type": "box", "center": [10, -2.25, -1], "size": [12, 3.5, 18] } ],
+   "things": [
+    { "type": "box", "name": "key (quest item)", "center": [6, -2.85, 6], "size": [0.3, 0.1, 0.15], "color": "#d8b25e", "solid": false }
+   ]
+  }
+ ]
+}

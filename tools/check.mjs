@@ -15,6 +15,17 @@ try { map = JSON.parse(fs.readFileSync(file, 'utf8')); }
 catch (e) { console.log(`error: ${file} is not valid JSON: ${e.message}`); process.exit(1); }
 
 const errors = [], warnings = [];
+// with a level model, rooms are named areas on top of it: they don't
+// have to overlap, the model's own geometry decides where you can go
+const areaMode = Array.isArray(map.models) && map.models.length > 0;
+for (const [i, m] of (map.models || []).entries()) {
+  if (!m.file) errors.push(`model ${i + 1} has no "file"`);
+  else if (!/\.(glb|gltf)$/i.test(m.file)) warnings.push(`model "${m.file}" is not a .glb or .gltf file`);
+  else {
+    const path = new URL(m.file, 'file://' + fs.realpathSync(file)).pathname;
+    if (!fs.existsSync(path)) errors.push(`model "${m.file}" was not found next to the map`);
+  }
+}
 const rooms = new Map();
 for (const [i, r] of (map.rooms || []).entries()) {
   if (!r.name) { errors.push(`room ${i + 1} has no name`); continue; }
@@ -52,17 +63,17 @@ for (let i = 0; i < names.length; i++) for (let j = i + 1; j < names.length; j++
 for (const [name, r] of rooms) {
   for (const l of r.json.links || []) {
     if (!rooms.has(l)) errors.push(`"${name}" links to "${l}", but there is no room with that name`);
-    else if (!touchSet.get(name).has(l)) {
+    else if (!areaMode && !touchSet.get(name).has(l)) {
       errors.push(`"${name}" links to "${l}", but their shapes don't overlap, so there is no way through`);
     }
   }
   for (const o of touchSet.get(name)) {
     const linked = (r.json.links || []).includes(o) || (rooms.get(o).json.links || []).includes(name);
-    if (!linked && name < o) warnings.push(`"${name}" and "${o}" overlap (there is an opening) but neither lists the other in links`);
+    if (!areaMode && !linked && name < o) warnings.push(`"${name}" and "${o}" overlap (there is an opening) but neither lists the other in links`);
   }
-  if (rooms.size > 1 && touchSet.get(name).size === 0) warnings.push(`"${name}" doesn't touch any other room`);
+  if (!areaMode && rooms.size > 1 && touchSet.get(name).size === 0) warnings.push(`"${name}" doesn't touch any other room`);
   const b = r.sdf.bbox;
-  if (b.max[1] - b.min[1] < 1.9) warnings.push(`"${name}" is under 1.9 m tall: a player can't stand up in it`);
+  if (!areaMode && b.max[1] - b.min[1] < 1.9) warnings.push(`"${name}" is under 1.9 m tall: a player can't stand up in it`);
   for (const [i, t] of (r.json.things || []).entries()) {
     const label = `"${name}" thing ${i + 1}${t.name ? ` (${t.name})` : ''}`;
     if (!['box', 'cylinder', 'cone', 'sphere', 'pipe'].includes(t.type)) { errors.push(`${label}: unknown type "${t.type}"`); continue; }

@@ -27,6 +27,30 @@ one metre, the numbers match your game. y is up.
 Every room is the empty space you can walk in, built from one or
 more shapes ("prims"). Shapes in the same room join together.
 
+## Level models
+
+A map can show a level exported from a game engine (glTF, `.glb` or
+`.gltf`) with `models`:
+
+```json
+"models": [
+  { "file": "castle.glb", "position": [0, 0, 0], "rotate": [0, 0, 0], "scale": 1 }
+]
+```
+
+| field      | needed | what it does |
+| ---------- | ------ | ------------ |
+| `file`     | yes    | path of the model, next to the map |
+| `position` | no     | move it, in metres |
+| `rotate`   | no     | turn it, degrees around x, y, z |
+| `scale`    | no     | one number, or [x, y, z] (0.01 for centimetres) |
+
+When a map has a model, its rooms become **named areas**: the model's
+geometry is drawn and walked on, and the rooms only mark where each
+area is (with a tint when selected). They don't need to overlap.
+A `.glb` file in the maps folder that no map uses also opens on its
+own.
+
 ## Room fields
 
 | field      | needed | what it does |

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { compileRoom } from './shapes.js';
 import { buildThings } from './things.js';
+import { loadModel, sphereHits, floorBelow } from './models.js';
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
@@ -68,6 +69,8 @@ const S = {
   hidden: new Set(),            // districts switched off
   colourBy: saved.colourBy || 'height',
   roofOpen: true,
+  areaMode: false,              // the map has a model: rooms are named areas on it
+  models: [], modelKey: null, modelSamples: [],
   labels: saved.labels !== false,
   win: null,                    // [low, high] heights shown, or null = all
   world: null,                  // box around all rooms
@@ -120,6 +123,14 @@ async function findVersions() {
 async function poll() {
   if (!S.live || !S.versions.length) return;
   const v = S.versions[S.version];
+  if (/\.(glb|gltf)$/i.test(v.file)) {   // a level model on its own
+    const key = 'model:' + v.file;
+    if (S.mapText !== key) {
+      S.mapText = key; S.errors = [];
+      setMap({ name: v.label, units: 'm', models: [{ file: v.file }], rooms: [] });
+    }
+    return;
+  }
   try {
     const txt = await fetchText(S.base + v.file);
     if (txt !== S.mapText) useMapText(txt, v.file);
@@ -145,6 +156,8 @@ scene.add(group);
 function setMap(map) {
   const first = !S.map;
   S.map = map;
+  S.areaMode = Array.isArray(map.models) && map.models.length > 0;
+  loadModels(map);
   $('title').textContent = map.name || 'holomap';
   document.title = (map.name ? map.name + ' · ' : '') + 'holomap';
   const seen = new Set();
@@ -201,11 +214,80 @@ function setMap(map) {
   buildDistricts(); buildResults(); showCard();
   worldChanged(); setStatus();
   if (first) {
-    const wait = () => (S.pending > 0) ? setTimeout(wait, 80) : frameAll(false);
+    const wait = () => (S.pending > 0 || S.modelLoading) ? setTimeout(wait, 80)
+      : (S.framed = true, frameAll(false));
     wait();
   }
 }
 const anyMesh = () => [...S.rooms.values()].some(r => r.mesh);
+
+// ---------- models (levels exported from a game) ----------
+const modelGroup = new THREE.Group();
+scene.add(modelGroup);
+const roofU = { on: { value: 0 }, min: { value: new THREE.Vector3() }, max: { value: new THREE.Vector3() } };
+// lets the selected area "lift its roof": the model is cut away above
+// a height, but only over that area
+function addRoofCut(mat) {
+  if (mat.userData.roofCut) return mat;
+  mat.userData.roofCut = true;
+  mat.clippingPlanes = [clipTop, clipBottom];
+  mat.clipShadows = true;
+  const prev = mat.onBeforeCompile;
+  mat.onBeforeCompile = (sh, r) => {
+    if (prev) prev(sh, r);
+    sh.uniforms.uRoofOn = roofU.on; sh.uniforms.uRoofMin = roofU.min; sh.uniforms.uRoofMax = roofU.max;
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vRoofW;')
+      .replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\nvRoofW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', '#include <common>\nuniform float uRoofOn; uniform vec3 uRoofMin; uniform vec3 uRoofMax; varying vec3 vRoofW;')
+      .replace('#include <clipping_planes_fragment>', `#include <clipping_planes_fragment>
+if (uRoofOn > 0.5 && all(greaterThan(vRoofW, uRoofMin)) && all(lessThan(vRoofW, uRoofMax))) discard;`);
+  };
+  mat.needsUpdate = true;
+  return mat;
+}
+const heightMat = addRoofCut(new THREE.MeshStandardMaterial({
+  vertexColors: true, roughness: 0.85, metalness: 0, side: THREE.DoubleSide,
+}));
+
+let modelJob = 0;
+async function loadModels(map) {
+  const specs = S.areaMode ? map.models : [];
+  const key = JSON.stringify(specs);
+  if (key === S.modelKey) return;
+  S.modelKey = key;
+  const job = ++modelJob;
+  for (const m of S.models) { modelGroup.remove(m); m.geometry.disposeBoundsTree(); m.geometry.dispose(); }
+  S.models = []; S.modelSamples = [];
+  if (!specs.length) { worldChanged(); return; }
+  S.modelLoading = true; setStatus();
+  const loaded = [];
+  for (const spec of specs) {
+    if (!spec || !spec.file) { showError('a model has no "file"'); continue; }
+    const url = S.blobs && S.blobs[spec.file] ? S.blobs[spec.file] : S.base + spec.file;
+    try { loaded.push(...await loadModel(url, spec)); }
+    catch (e) { showError(`could not load ${spec.file}: ${e.message || e}`); }
+  }
+  S.modelLoading = false;
+  if (job !== modelJob) return;
+  for (const m of loaded) {
+    m.geometry.setAttribute('color', new THREE.BufferAttribute(
+      new Float32Array(m.geometry.attributes.position.count * 3), 3));
+    const orig = m.userData.original;
+    m.userData.original = Array.isArray(orig) ? orig.map(addRoofCut) : addRoofCut(orig);
+    modelGroup.add(m);
+  }
+  S.models = loaded;
+  // points for the side view
+  for (const m of loaded) {
+    const pos = m.geometry.attributes.position, step = Math.max(1, Math.floor(pos.count / 6000));
+    for (let i = 0; i < pos.count; i += step) S.modelSamples.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+  }
+  buildColourButtons();
+  worldChanged(); setStatus();
+  if (!S.framed) { S.framed = true; frameAll(false); }
+}
 
 function attachMesh(r, m) {
   const c = [0, 1, 2].map(i => (m.bbox.min[i] + m.bbox.max[i]) / 2);
@@ -223,7 +305,8 @@ function attachMesh(r, m) {
   g.computeBoundingBox(); g.computeBoundingSphere();
   if (r.mesh) { r.mesh.geometry.dispose(); r.mesh.geometry = g; }
   else {
-    r.mesh = new THREE.Mesh(g, roomMaterial(r.clip));
+    r.solidMat = roomMaterial(r.clip);
+    r.mesh = new THREE.Mesh(g, r.solidMat);
     r.mesh.castShadow = r.mesh.receiveShadow = true;
     r.mesh.userData.name = r.name;
     group.add(r.mesh);
@@ -243,6 +326,19 @@ function attachMesh(r, m) {
 }
 
 const shown = r => !S.hidden.has(r.district);
+// the named area (room) a point is in, if any
+function areaAt(x, y, z, margin = 0) {
+  let best = null, bd = Infinity;
+  for (const r of S.rooms.values()) {
+    if (!r.sdf || !r.bbox || !shown(r)) continue;
+    const b = r.bbox;
+    if (x < b.min[0] - margin || y < b.min[1] - margin || z < b.min[2] - margin
+      || x > b.max[0] + margin || y > b.max[1] + margin || z > b.max[2] + margin) continue;
+    const d = r.sdf.eval(x, y, z);
+    if (d < margin && d < bd) { bd = d; best = r; }
+  }
+  return best;
+}
 
 function rebuildThings(r) {
   if (r.thingGroup) {
@@ -295,6 +391,7 @@ let bandSize = 10;
 function worldChanged() {
   const b = new THREE.Box3();
   for (const r of S.rooms.values()) if (r.extent) b.union(r.extent);
+  for (const m of S.models) b.union(m.geometry.boundingBox);
   S.world = b.isEmpty() ? null : b;
   if (S.world) {
     const size = S.world.getSize(new THREE.Vector3());
@@ -312,9 +409,11 @@ function worldChanged() {
   if (S.world) {
     const hs = [...S.rooms.values()].filter(r => r.extent)
       .map(r => r.extent.max.y - r.extent.min.y).sort((a, b) => a - b);
-    const med = hs[Math.floor(hs.length / 2)] || 10;
+    const med = hs[Math.floor(hs.length / 2)] || 4;
     const H = S.world.max.y - S.world.min.y;
-    bandSize = niceStep(Math.min(Math.max(med * 1.2, H / 24), H / 4));
+    const hasRooms = hs.length > 0 && !S.areaMode;
+    bandSize = hasRooms ? niceStep(Math.min(Math.max(med * 1.2, H / 24), H / 4))
+      : niceStep(H / 10);          // a level model: about ten bands
   } else bandSize = 10;
   recolour();
   drawElev();
@@ -364,6 +463,22 @@ function recolour() {
     }
     col.needsUpdate = true;
   }
+  // the level model: height colours per vertex, or its own materials
+  const selArea = S.areaMode && S.selected && !S.inside ? S.rooms.get(S.selected) : null;
+  for (const m of S.models) {
+    if (S.colourBy === 'original') { m.material = m.userData.original; continue; }
+    m.material = heightMat;
+    const pos = m.geometry.attributes.position, col = m.geometry.attributes.color;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+      let c;
+      if (S.colourBy === 'height') c = colourAt(null, y);
+      else { const a = areaAt(x, y, z, 0.5); c = a ? colourAt(a, y) : new THREE.Color('#b9bcc2'); }
+      if (selArea && !(areaAt(x, y, z, 0.5) === selArea)) c.lerp(PALE, 0.6);
+      col.setXYZ(i, c.r, c.g, c.b);
+    }
+    col.needsUpdate = true;
+  }
   for (const r of S.rooms.values()) {
     if (!r.thingGroup) continue;
     const pale = S.selected && !S.inside && r.name !== S.selected;
@@ -402,16 +517,40 @@ function applyStates() {
   clipBottom.constant = S.win && !S.inside ? -(S.win[0] - 0.05) : 1e9;
   for (const r of S.rooms.values()) {
     if (!r.mesh) continue;
-    r.mesh.visible = shown(r) && (S.inside ? true : inWin(r));
-    if (r.thingGroup) r.thingGroup.visible = r.mesh.visible;
+    r.on = shown(r) && (S.inside ? true : inWin(r));
+    r.mesh.visible = r.on;
+    if (S.areaMode) {
+      // on a real level, rooms are named areas: only a light tint
+      // when selected or pointed at, never solid
+      if (!r.areaMat) r.areaMat = new THREE.MeshBasicMaterial({
+        color: '#23707a', transparent: true, depthWrite: false, side: THREE.DoubleSide,
+        clippingPlanes: r.clip,
+      });
+      r.mesh.material = r.areaMat;
+      const op = S.inside ? 0 : r.name === S.selected ? 0.2 : r.name === S.hovered ? 0.1 : 0;
+      r.areaMat.opacity = op;
+      r.mesh.visible = r.on && op > 0;
+      r.mesh.castShadow = false;
+    } else if (r.solidMat && r.mesh.material !== r.solidMat) {
+      r.mesh.material = r.solidMat; r.mesh.castShadow = true;
+    }
+    if (r.thingGroup) r.thingGroup.visible = r.on;
     // the selected room's roof lifts so you can see what is inside
     r.roof.constant = (S.roofOpen && !S.inside && r.name === S.selected && r.extent)
       ? roofHeight(r) : 1e9;
   }
   // inside: no sun (the ceiling would shade everything); light from
   // above and a lamp at the camera that fades with distance
-  lamp.intensity = S.inside ? 14 : 0;
-  sun.intensity = S.inside ? 0 : 2.7;
+  // (a level model keeps its sun; no camera lamp, which would glare)
+  lamp.intensity = S.inside && !S.areaMode ? 14 : 0;
+  sun.intensity = S.inside && !S.areaMode ? 0 : 2.7;
+  // lift the roof of the selected area of a level model
+  const sa = S.areaMode && S.roofOpen && !S.inside && S.selected && S.rooms.get(S.selected);
+  roofU.on.value = sa && sa.extent ? 1 : 0;
+  if (sa && sa.extent) {
+    roofU.min.value.set(sa.extent.min.x - 0.3, roofHeight(sa), sa.extent.min.z - 0.3);
+    roofU.max.value.set(sa.extent.max.x + 0.3, 1e9, sa.extent.max.z + 0.3);
+  }
   hemi.intensity = S.inside ? 0.7 : 1.05;
   gridU.value = S.inside ? 1 : 0;
   $('range').textContent = S.win
@@ -429,6 +568,7 @@ const fmt = v => (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(1)).replace(/\.0
 // rooms between the camera and the selected room fade out
 const fadeRay = new THREE.Ray();
 function updateFades() {
+  if (S.areaMode) return;
   const target = !S.inside && S.selected && S.rooms.get(S.selected);
   let center = null, dist = 0;
   if (target && target.extent) {
@@ -539,6 +679,19 @@ function inThing(x, y, z, pad) {
 }
 // the highest floor or thing top at or below (x, yTop, z)
 function groundBelow(x, yTop, z) {
+  if (S.areaMode) {           // a real level: cast a ray down onto it
+    let g = floorBelow(S.models, x, yTop, z);
+    if (g === null) g = -Infinity;
+    for (const r of S.rooms.values()) {
+      if (!shown(r)) continue;
+      for (const s2 of r.solids) {
+        const b = s2.box;
+        if (x >= b.min.x && x <= b.max.x && z >= b.min.z && z <= b.max.z
+          && b.max.y <= yTop + 1e-3 && b.max.y > g) g = b.max.y;
+      }
+    }
+    return g;
+  }
   let y = yTop, d = airD(x, y, z).d;
   if (d >= 0) return null;
   let step = 0;
@@ -570,6 +723,11 @@ function groundBelow(x, yTop, z) {
 // shapes or rooms join don't count as walls.)
 const inAir = (x, y, z) => airD(x, y, z).d < 0;
 function bodyFits(x, y, z) {
+  if (S.areaMode) {           // a real level: keep the body clear of its surfaces
+    if (walk.fly) return !sphereHits(S.models, x, y + EYE, z, 0.2) && !inThing(x, y + EYE, z, 0.15);
+    for (const h of [0.5, 1.05, EYE - 0.1]) if (sphereHits(S.models, x, y + h, z, BODY)) return false;
+    return !inThing(x, y + 0.45, z, BODY) && !inThing(x, y + EYE - 0.1, z, BODY);
+  }
   if (walk.fly) { // flying, you are just a camera: fits through low gaps
     const e = y + EYE, q = 0.18;
     return inAir(x, e, z) && inAir(x + q, e, z) && inAir(x - q, e, z) && inAir(x, e, z + q)
@@ -583,20 +741,25 @@ function bodyFits(x, y, z) {
   return !inThing(x, y + 0.45, z, BODY) && !inThing(x, y + EYE - 0.1, z, BODY);
 }
 
+const OUTSIDE = '(no named area)';
 function enterRoom(r, at) {
   if (!r.insidePoint) return;
+  enterAt(at || r.insidePoint.clone(), r.name);
+}
+// start walking at point p (inside room or area "name")
+function enterAt(p, name) {
   if (!S.inside) S.saved = { pos: camera.position.clone(), target: controls.target.clone() };
-  const p = at || r.insidePoint.clone();
+  const r = { name };
   const d = controls.target.clone().sub(camera.position); d.y = 0;
   if (d.lengthSq() < 1e-6) d.set(0, 0, -1);
   d.normalize();
   look.yaw = Math.atan2(-d.x, -d.z); look.pitch = -0.05;
   controls.enabled = false;
-  S.inside = r.name; S.selected = r.name;
+  S.inside = r.name; S.selected = S.rooms.has(name) ? name : null;
   // stand on the floor below that point, if there is room to stand
   const g = groundBelow(p.x, p.y, p.z);
-  walk.vy = 0; walk.ground = true;
-  if (g !== null && bodyFits(p.x, g, p.z)) { walk.fly = false; walk.feet.set(p.x, g, p.z); }
+  walk.vy = 0; walk.ground = true; walk.fly = false;
+  if (g !== null && isFinite(g) && bodyFits(p.x, g, p.z)) { walk.feet.set(p.x, g, p.z); }
   else { walk.fly = true; walk.feet.set(p.x, p.y - EYE, p.z); }
   walk.start = walk.feet.clone();
   const eye = walk.feet.clone(); eye.y += EYE;
@@ -628,7 +791,9 @@ function tryStep(dx, dz) {
   const g = groundBelow(nx, f.y + STEP, nz);
   if (g === null) return false;                 // a wall
   const ny = g > f.y ? g : f.y;                 // step up onto stairs
-  if (!bodyFits(nx, ny, nz)) return false;
+  // the front edge of a step touches your legs before you are on it:
+  // like a game character, test with the body lifted by one step
+  if (!bodyFits(nx, ny, nz) && !(walk.ground && bodyFits(nx, f.y + STEP - 0.25, nz))) return false;
   f.x = nx; f.z = nz; f.y = ny;
   return true;
 }
@@ -667,7 +832,8 @@ function walkStep(dt) {
     const g = groundBelow(f.x, f.y + 0.05, f.z);
     const floor = g === null ? -Infinity : g;
     if (ny <= floor) { f.y = floor; walk.vy = 0; walk.ground = true; }
-    else if (walk.vy > 0 && !inAir(f.x, ny + EYE + 0.12, f.z)) { walk.vy = 0; }
+    else if (walk.vy > 0 && (S.areaMode ? sphereHits(S.models, f.x, ny + EYE + 0.05, f.z, 0.15)
+      : !inAir(f.x, ny + EYE + 0.12, f.z))) { walk.vy = 0; }
     else { f.y = ny; walk.ground = ny - floor < 0.02; }
     // fell out of the map: back to where you came in
     if (S.world && f.y < S.world.min.y - 30) { f.copy(walk.start); walk.vy = 0; }
@@ -676,7 +842,11 @@ function walkStep(dt) {
   // which room you are in now (stay in the current one while in it)
   const cur = S.rooms.get(S.inside);
   const e = camera.position;
-  if (!(cur && cur.sdf && cur.sdf.eval(e.x, e.y, e.z) < 0)) {
+  if (S.areaMode) {
+    const a = areaAt(e.x, e.y, e.z);
+    const name = a ? a.name : OUTSIDE;
+    if (name !== S.inside) { S.inside = name; if (a) S.selected = a.name; showCard(); }
+  } else if (!(cur && cur.sdf && cur.sdf.eval(e.x, e.y, e.z) < 0)) {
     const a = airD(e.x, e.y, e.z);
     if (a.room && a.d < 0 && a.room.name !== S.inside) {
       S.inside = a.room.name; S.selected = a.room.name; showCard();
@@ -696,7 +866,7 @@ function setWhere() {
   if (!S.inside) { w.style.display = 'none'; return; }
   w.style.display = 'block';
   w.innerHTML = '';
-  const b = document.createElement('b'); b.textContent = S.inside;
+  const b = document.createElement('b'); b.textContent = S.rooms.has(S.inside) ? S.inside : 'the level';
   const mode = document.createElement('button');
   mode.textContent = walk.fly ? 'flying (V to walk)' : 'walking (V to fly)';
   mode.onclick = () => { toggleFly(); canvas.focus(); };
@@ -745,14 +915,20 @@ function pick(e) {
   ray.setFromCamera(new THREE.Vector2(
     ((e.clientX - rect.left) / rect.width) * 2 - 1,
     -((e.clientY - rect.top) / rect.height) * 2 + 1), camera);
-  const targets = [];
+  const targets = [...S.models];
   for (const r of S.rooms.values()) {
-    if (!r.mesh || !r.mesh.visible || r.mesh.material.transparent) continue;
-    targets.push(r.mesh);
+    if (!r.mesh || !r.on) continue;
+    if (!S.areaMode && !r.mesh.material.transparent) targets.push(r.mesh);
     if (r.thingGroup && r.thingGroup.visible) targets.push(...r.thingGroup.children);
   }
   // skip anything cut away (layer band, lifted roof)
   const kept = h => {
+    if (h.object.userData.model) {
+      const q = h.point;
+      if (![clipTop, clipBottom].every(pl => pl.distanceToPoint(q) >= -0.02)) return false;
+      const mn = roofU.min.value, mx = roofU.max.value;
+      return !(roofU.on.value && q.x > mn.x && q.y > mn.y && q.z > mn.z && q.x < mx.x && q.z < mx.z);
+    }
     const r = S.rooms.get(h.object.userData.name || h.object.userData.room);
     return r && r.clip.every(pl => pl.distanceToPoint(h.point) >= -0.02);
   };
@@ -761,6 +937,13 @@ function pick(e) {
   let h = hits[0];
   // inside a room, its own walls don't count as a pick
   if (S.inside) h = hits.find(x => x.object.userData.thing || x.object.userData.name !== S.inside) || hits[0];
+  if (h.object.userData.model) {
+    // a level model: which named area is this point in?
+    const n = h.face ? h.face.normal.clone() : new THREE.Vector3(0, 1, 0);
+    if (n.dot(ray.ray.direction) > 0) n.negate();
+    const q = h.point.clone().addScaledVector(n, 0.3);
+    return { room: areaAt(q.x, q.y, q.z, 0.3), point: h.point, normal: n, model: true, thing: null };
+  }
   const name = h.object.userData.name || h.object.userData.room;
   return { room: S.rooms.get(name), point: h.point, thing: h.object.userData.thing || null };
 }
@@ -770,8 +953,8 @@ function hover(e) {
   if (now - hoverT < 80) return;
   hoverT = now;
   const h = pick(e);
-  const name = h && !S.inside ? h.room.name : null;
-  if (name !== S.hovered) { S.hovered = name; requestRender(); }
+  const name = h && h.room && !S.inside ? h.room.name : null;
+  if (name !== S.hovered) { S.hovered = name; if (S.areaMode) applyStates(); requestRender(); }
   const tip = $('tip');
   if (h && h.thing && h.thing.name) {
     tip.textContent = h.thing.name + (h.thing.note ? ' · ' + h.thing.note : '');
@@ -784,11 +967,17 @@ canvas.addEventListener('click', e => {
   if (lastDrag > 4) return;          // that was a drag, not a click
   const h = pick(e);
   if (S.inside) return;
-  select(h ? h.room.name : null);
+  select(h && h.room ? h.room.name : null);
 });
 canvas.addEventListener('dblclick', e => {
   const h = pick(e);
   if (!h) return;
+  if (h.model) {   // walk from the spot you double-clicked on the level
+    const at = h.point.clone().addScaledVector(h.normal, 0.4);
+    at.y += 0.5;
+    enterAt(at, h.room ? h.room.name : OUTSIDE);
+    return;
+  }
   const r = h.room;
   let at = null;
   if (r.sdf) {
@@ -871,6 +1060,14 @@ function drawElev() {
     const y = lo + i * bandSize;
     if (y < M.y0 - 1e-6 || y > M.y1 + 1e-6) continue;
     ex.fillText(fmt(y), PADL - 11, M.toY(y));
+  }
+  // the level model, seen from the side
+  if (S.modelSamples.length) {
+    const s2 = S.modelSamples, ai = sideAxis === 'x' ? 0 : 2;
+    for (let i = 0; i < s2.length; i += 3) {
+      ex.fillStyle = S.colourBy === 'height' ? '#' + colourAt(null, s2[i + 1]).getHexString() : '#9aa0a8';
+      ex.fillRect(M.toX(s2[i + ai]) - 0.75, M.toY(s2[i + 1]) - 0.75, 1.5, 1.5);
+    }
   }
   // every room, seen from the side
   for (const n2 of S.order) {
@@ -1118,7 +1315,7 @@ function drawLabels() {
   const want = [];
   for (const n of S.order) {
     const r = S.rooms.get(n);
-    if (!r.mesh || !r.mesh.visible || !r.extent || r.mesh.material.transparent) continue;
+    if (!r.mesh || !r.on || !r.extent || (!S.areaMode && r.mesh.material.transparent)) continue;
     const pri = r.name === S.selected ? 3 : r.name === S.hovered ? 2 : S.labels ? 1 : 0;
     if (!pri || r.name === S.inside || (S.inside && pri < 2)) continue;
     // pin the name to the room itself (a ring's middle is empty)
@@ -1156,7 +1353,20 @@ function seg(id, value, on) {
   }
 }
 const setColour = v => { S.colourBy = v; save(); seg('colourBy', v, setColour); recolour(); drawElev(); };
-seg('colourBy', S.colourBy, setColour);
+function buildColourButtons() {
+  const box = $('colourBy');
+  let b = box.querySelector('[data-v=original]');
+  if (S.models.length && !b) {
+    b = document.createElement('button'); b.dataset.v = 'original'; b.textContent = 'own colours';
+    b.title = "The level's own materials and textures";
+    box.append(b);
+  } else if (!S.models.length && b) {
+    b.remove();
+    if (S.colourBy === 'original') S.colourBy = 'height';
+  }
+  seg('colourBy', S.colourBy, setColour);
+}
+buildColourButtons();
 seg('views', '', v => setView(v));
 $('labelsBtn').textContent = S.labels ? 'names: on' : 'names: off';
 $('labelsBtn').onclick = () => {
@@ -1196,6 +1406,7 @@ function setStatus() {
   box.innerHTML = '';
   const lines = [];
   if (S.pending > 0) lines.push(`Building rooms… ${S.pending} left`);
+  if (S.modelLoading) lines.push('Loading the level model…');
   if (!S.live) lines.push('Dropped file: not watching for changes');
   if (lines.length) box.append(lines.join('\n'));
   for (const err of S.errors.slice(-4)) {
@@ -1209,10 +1420,24 @@ addEventListener('dragover', e => { e.preventDefault(); $('drop').style.display 
 addEventListener('dragleave', () => { $('drop').style.display = 'none'; });
 addEventListener('drop', async e => {
   e.preventDefault(); $('drop').style.display = 'none';
-  const f = e.dataTransfer.files[0]; if (!f) return;
-  S.live = false; S.versions = [{ label: f.name.replace(/\.json$/, ''), file: f.name }];
-  S.version = 0; buildVersions(); S.map = null;
-  useMapText(await f.text(), f.name);
+  const files = [...e.dataTransfer.files];
+  if (!files.length) return;
+  // level models dropped with (or without) a map file
+  S.blobs = S.blobs || {};
+  for (const f of files) if (/\.(glb|gltf)$/i.test(f.name)) S.blobs[f.name] = URL.createObjectURL(f);
+  const json = files.find(f => /\.json$/i.test(f.name));
+  const model = files.find(f => /\.(glb|gltf)$/i.test(f.name));
+  S.live = false; S.map = null; S.modelKey = null; S.framed = false;
+  if (json) {
+    S.versions = [{ label: json.name.replace(/\.json$/, ''), file: json.name }];
+    S.version = 0; buildVersions();
+    useMapText(await json.text(), json.name);
+  } else if (model) {
+    S.versions = [{ label: model.name, file: model.name }];
+    S.version = 0; buildVersions();
+    S.mapText = 'model:' + model.name;
+    setMap({ name: model.name, units: 'm', models: [{ file: model.name }], rooms: [] });
+  }
 });
 
 // ---------- render ----------
